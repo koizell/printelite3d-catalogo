@@ -7,73 +7,53 @@
   <meta name="description" content="Impresion 3D, stickers y piezas personalizadas hechas a mano.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="estilos.css">
 </head>
 <body>
-  <div class="grano" aria-hidden="true"></div>
 
-  <header class="hero">
-    <div class="hero-orbe hero-orbe--1" aria-hidden="true"></div>
-    <div class="hero-orbe hero-orbe--2" aria-hidden="true"></div>
-    <div class="hero-inner">
-      <p class="hero-eyebrow reveal" data-d="0">
-        <span class="punto"></span>
-        <span id="hero-lugar">Hecho a mano</span>
-      </p>
-      <h1 class="hero-titulo reveal" data-d="1">
-        <span id="nombre-negocio">PrintElite3D</span><span class="hero-punto">.</span>
-      </h1>
-      <p class="hero-tagline reveal" data-d="2">
-        Impresi&oacute;n 3D, stickers y piezas personalizadas &mdash;
-        <em>dise&ntilde;adas para sorprender.</em>
-      </p>
-      <div class="hero-cta reveal" data-d="3">
-        <a id="hero-ig" class="btn-ig" href="https://www.instagram.com/printelite3d" target="_blank" rel="noopener noreferrer">
-          <svg class="ig-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <rect x="2" y="2" width="20" height="20" rx="6" ry="6" stroke="currentColor" stroke-width="2"/>
-            <circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="2"/>
-            <circle cx="17.6" cy="6.4" r="1.4" fill="currentColor"/>
-          </svg>
-          <span>S&iacute;guenos y haz tu pedido</span>
-        </a>
-        <span class="hero-meta">
-          <span id="hero-ciudad" class="hero-dato" hidden></span>
-          <span id="hero-telefono" class="hero-dato" hidden></span>
-        </span>
-      </div>
-    </div>
-    <div class="hero-estrella" aria-hidden="true">&#x2726;</div>
+  <header class="top">
+    <a class="logo" id="logo" href="#top">
+      <span class="logo-mark" aria-hidden="true">P</span>
+      <span class="logo-text" id="nombre-negocio">PrintElite3D</span>
+    </a>
+    <a id="top-ig" class="top-ig" href="https://www.instagram.com/printelite3d" target="_blank" rel="noopener noreferrer">
+      <svg class="ig-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="3" y="3" width="18" height="18" rx="5" ry="5" stroke="currentColor" stroke-width="1.6"/>
+        <circle cx="12" cy="12" r="3.6" stroke="currentColor" stroke-width="1.6"/>
+        <circle cx="17.2" cy="6.8" r="1.1" fill="currentColor"/>
+      </svg>
+      <span class="top-ig-label">Instagram</span>
+    </a>
   </header>
 
-  <div class="marquee" aria-hidden="true">
-    <div class="marquee-track">
-      <span>Impresi&oacute;n 3D &nbsp;&#x2726;&nbsp; Stickers &nbsp;&#x2726;&nbsp; Personalizado &nbsp;&#x2726;&nbsp; Hecho en Monter&iacute;a &nbsp;&#x2726;&nbsp; Dise&ntilde;o propio &nbsp;&#x2726;&nbsp;</span>
-      <span>Impresi&oacute;n 3D &nbsp;&#x2726;&nbsp; Stickers &nbsp;&#x2726;&nbsp; Personalizado &nbsp;&#x2726;&nbsp; Hecho en Monter&iacute;a &nbsp;&#x2726;&nbsp; Dise&ntilde;o propio &nbsp;&#x2726;&nbsp;</span>
+  <section class="hero" id="top">
+    <p class="hero-eyebrow" id="hero-eyebrow">Estudio de impresi&oacute;n 3D</p>
+    <h1 class="hero-titulo">Piezas hechas<br>para sorprender.</h1>
+    <p class="hero-tagline">Impresi&oacute;n 3D, stickers y creaciones personalizadas &mdash; hechas a mano con cuidado. Escr&iacute;benos y lo hacemos realidad.</p>
+    <div class="hero-meta">
+      <span id="hero-ciudad" class="hero-dato" hidden></span>
+      <span id="hero-telefono" class="hero-dato" hidden></span>
     </div>
-  </div>
+  </section>
 
   <main class="catalogo">
     <div class="catalogo-head">
-      <h2 class="catalogo-titulo">El cat&aacute;logo</h2>
-      <p class="catalogo-sub">Cada pieza, lista para llevar.</p>
+      <h2 class="catalogo-titulo">Cat&aacute;logo</h2>
+      <span class="catalogo-linea" aria-hidden="true"></span>
+      <span id="catalogo-conteo" class="catalogo-conteo"></span>
     </div>
     <div id="catalogo-grid" class="grid"></div>
   </main>
 
   <footer class="footer">
     <div class="footer-inner">
-      <div class="footer-marca">PrintElite3D<span class="hero-punto">.</span></div>
+      <div class="footer-marca"><span class="logo-mark" aria-hidden="true">P</span> <span id="footer-nombre">PrintElite3D</span></div>
       <a id="footer-ig" class="footer-ig-link" href="https://www.instagram.com/printelite3d" target="_blank" rel="noopener noreferrer">
-        <svg class="ig-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <rect x="2" y="2" width="20" height="20" rx="6" ry="6" stroke="currentColor" stroke-width="2"/>
-          <circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="2"/>
-          <circle cx="17.6" cy="6.4" r="1.4" fill="currentColor"/>
-        </svg>
         <span id="footer-ig-label">@printelite3d</span>
       </a>
       <p id="footer-leyenda" class="footer-leyenda" hidden></p>
-      <p class="footer-copy">&copy; <span id="footer-year"></span> PrintElite3D &mdash; hecho con cari&ntilde;o.</p>
+      <p class="footer-copy">&copy; <span id="footer-year"></span> PrintElite3D</p>
     </div>
   </footer>
 
