@@ -89,6 +89,25 @@
     if (p.descripcion) {
       var d = document.createElement("p"); d.className = "card-desc"; d.textContent = p.descripcion; body.appendChild(d);
     }
+    if (p.especificaciones && p.especificaciones.length) {
+      var ficha = document.createElement("dl");
+      ficha.className = "card-ficha";
+      for (var si = 0; si < p.especificaciones.length; si++) {
+        var spec = p.especificaciones[si];
+        var fila_spec = document.createElement("div");
+        fila_spec.className = "ficha-fila";
+        var et = document.createElement("span");
+        et.className = "ficha-et";
+        et.textContent = spec.etiqueta == null ? "" : String(spec.etiqueta);
+        var val_spec = document.createElement("span");
+        val_spec.className = "ficha-val";
+        val_spec.textContent = spec.valor == null ? "" : String(spec.valor);
+        fila_spec.appendChild(et);
+        fila_spec.appendChild(val_spec);
+        ficha.appendChild(fila_spec);
+      }
+      body.appendChild(ficha);
+    }
     var fila = document.createElement("div"); fila.className = "card-precio";
     var pf = formatearPrecio(p.precio);
     var val = document.createElement("span");
