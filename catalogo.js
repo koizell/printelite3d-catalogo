@@ -21,6 +21,22 @@
     return limpio || "printelite3d";
   }
 
+  /* divide un texto en parrafos por saltos de linea; devuelve un DocumentFragment
+     con un <p> por parrafo (textContent, nunca innerHTML con datos) */
+  function parrafos(texto) {
+    var frag = document.createDocumentFragment();
+    if (!texto) return frag;
+    var partes = String(texto).split(/\n+/);
+    for (var i = 0; i < partes.length; i++) {
+      var t = partes[i].trim();
+      if (!t) continue;
+      var p = document.createElement("p");
+      p.textContent = t;
+      frag.appendChild(p);
+    }
+    return frag;
+  }
+
   /* extrae un ID de video de YouTube de una URL http(s); null si no aplica */
   function idYouTube(url) {
     if (!url) return null;
@@ -157,7 +173,10 @@
     body.className = "card-body";
     var h = document.createElement("h3"); h.className = "card-nombre"; h.textContent = p.nombre || ""; body.appendChild(h);
     if (p.descripcion) {
-      var d = document.createElement("p"); d.className = "card-desc"; d.textContent = p.descripcion; body.appendChild(d);
+      var primerParrafo = String(p.descripcion).split(/\n+/).map(function (t) { return t.trim(); }).filter(Boolean)[0];
+      if (primerParrafo) {
+        var d = document.createElement("p"); d.className = "card-desc"; d.textContent = primerParrafo; body.appendChild(d);
+      }
     }
     if (p.especificaciones && p.especificaciones.length) {
       body.appendChild(construirFicha(p));
@@ -402,9 +421,9 @@
     der.appendChild(nombreEl);
 
     if (p.descripcion) {
-      var descEl = document.createElement("p");
+      var descEl = document.createElement("div");
       descEl.className = "detalle-desc";
-      descEl.textContent = p.descripcion;
+      descEl.appendChild(parrafos(p.descripcion));
       der.appendChild(descEl);
     }
 
