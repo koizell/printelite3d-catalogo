@@ -21,6 +21,24 @@
     return limpio || "printelite3d";
   }
 
+  /* extrae un ID de video de YouTube de una URL http(s); null si no aplica */
+  function idYouTube(url) {
+    if (!url) return null;
+    var u = String(url).trim();
+    if (!/^https?:\/\//i.test(u)) return null;
+    if (!/:\/\/(www\.|m\.|music\.)?youtube\.com\//i.test(u) && !/:\/\/(www\.)?youtu\.be\//i.test(u)) return null;
+    var patrones = [
+      /(?:youtube\.com\/watch\?[^#]*\bv=)([A-Za-z0-9_-]{6,15})/i,
+      /youtu\.be\/([A-Za-z0-9_-]{6,15})/i,
+      /youtube\.com\/shorts\/([A-Za-z0-9_-]{6,15})/i
+    ];
+    for (var i = 0; i < patrones.length; i++) {
+      var m = u.match(patrones[i]);
+      if (m && m[1]) return m[1];
+    }
+    return null;
+  }
+
   var cat = window.CATALOGO || { negocio: {}, productos: [] };
   var negocio = cat.negocio || {};
   var productos = Array.isArray(cat.productos) ? cat.productos : [];
@@ -54,10 +72,16 @@
 
   /* conteo */
   var elC = document.getElementById("catalogo-conteo");
-  if (elC && productos.length) elC.textContent = productos.length === 1 ? "1 pieza" : productos.length + " piezas";
+  function actualizarConteo(n) {
+    if (!elC) return;
+    if (!n) { elC.textContent = ""; return; }
+    elC.textContent = n === 1 ? "1 pieza" : n + " piezas";
+  }
+  actualizarConteo(productos.length);
 
   /* grid */
   var grid = document.getElementById("catalogo-grid");
+  var filtrosEl = document.getElementById("catalogo-filtros");
 
   function placeholder(nom) {
     var ph = document.createElement("div");
@@ -66,21 +90,67 @@
     return ph;
   }
 
+  function portadaDe(p) {
+    if (p.imagenes && p.imagenes.length && p.imagenes[0]) return p.imagenes[0];
+    return p.imagen || null;
+  }
+
+  function construirFicha(p) {
+    var ficha = document.createElement("dl");
+    ficha.className = "card-ficha";
+    for (var si = 0; si < p.especificaciones.length; si++) {
+      var spec = p.especificaciones[si];
+      var fila_spec = document.createElement("div");
+      fila_spec.className = "ficha-fila";
+      var et = document.createElement("span");
+      et.className = "ficha-et";
+      et.textContent = spec.etiqueta == null ? "" : String(spec.etiqueta);
+      var val_spec = document.createElement("span");
+      val_spec.className = "ficha-val";
+      val_spec.textContent = spec.valor == null ? "" : String(spec.valor);
+      fila_spec.appendChild(et);
+      fila_spec.appendChild(val_spec);
+      ficha.appendChild(fila_spec);
+    }
+    return ficha;
+  }
+
   function tarjeta(p) {
     var card = document.createElement("article");
     card.className = "card reveal";
+    card.tabIndex = 0;
+    card.setAttribute("role", "button");
+    card.setAttribute("aria-label", "Ver detalle de " + (p.nombre || "producto"));
 
     var media = document.createElement("div");
     media.className = "card-media";
-    if (p.imagen) {
+    var portada = portadaDe(p);
+    if (portada) {
       var img = document.createElement("img");
       img.className = "card-foto";
-      img.src = esc(p.imagen); img.alt = esc(p.nombre || "Producto"); img.loading = "lazy";
+      img.src = portada; img.alt = p.nombre || "Producto"; img.loading = "lazy";
       img.onerror = function () { if (img.parentNode) img.parentNode.replaceChild(placeholder(p.nombre || "?"), img); };
       media.appendChild(img);
     } else {
       media.appendChild(placeholder(p.nombre || "?"));
     }
+
+    var badges = document.createElement("div");
+    badges.className = "card-badges";
+    if (p.imagenes && p.imagenes.length > 1) {
+      var bFotos = document.createElement("span");
+      bFotos.className = "card-badge";
+      bFotos.textContent = p.imagenes.length + " fotos";
+      badges.appendChild(bFotos);
+    }
+    if (p.video) {
+      var bVideo = document.createElement("span");
+      bVideo.className = "card-badge";
+      bVideo.textContent = "▶ video";
+      badges.appendChild(bVideo);
+    }
+    if (badges.childNodes.length) media.appendChild(badges);
+
     card.appendChild(media);
 
     var body = document.createElement("div");
@@ -90,23 +160,7 @@
       var d = document.createElement("p"); d.className = "card-desc"; d.textContent = p.descripcion; body.appendChild(d);
     }
     if (p.especificaciones && p.especificaciones.length) {
-      var ficha = document.createElement("dl");
-      ficha.className = "card-ficha";
-      for (var si = 0; si < p.especificaciones.length; si++) {
-        var spec = p.especificaciones[si];
-        var fila_spec = document.createElement("div");
-        fila_spec.className = "ficha-fila";
-        var et = document.createElement("span");
-        et.className = "ficha-et";
-        et.textContent = spec.etiqueta == null ? "" : String(spec.etiqueta);
-        var val_spec = document.createElement("span");
-        val_spec.className = "ficha-val";
-        val_spec.textContent = spec.valor == null ? "" : String(spec.valor);
-        fila_spec.appendChild(et);
-        fila_spec.appendChild(val_spec);
-        ficha.appendChild(fila_spec);
-      }
-      body.appendChild(ficha);
+      body.appendChild(construirFicha(p));
     }
     var fila = document.createElement("div"); fila.className = "card-precio";
     var pf = formatearPrecio(p.precio);
@@ -117,10 +171,22 @@
     var a = document.createElement("a");
     a.className = "card-pedir"; a.href = igURL; a.target = "_blank"; a.rel = "noopener noreferrer";
     a.textContent = "Pedir →";
+    a.addEventListener("click", function (ev) { ev.stopPropagation(); });
     fila.appendChild(a);
     body.appendChild(fila);
 
     card.appendChild(body);
+
+    card.addEventListener("click", function () { abrirDetalle(p, card); });
+    card.addEventListener("keydown", function (ev) {
+      if (ev.target !== card) return; /* Enter sobre "Pedir" debe navegar, no abrir el modal */
+      if (ev.key === "Enter" || ev.key === " " || ev.key === "Spacebar") {
+        ev.preventDefault();
+        abrirDetalle(p, card);
+      }
+    });
+
+    card.dataset.categoria = (p.categoria || "").trim();
     return card;
   }
 
@@ -133,6 +199,250 @@
     } else {
       productos.forEach(function (p) { grid.appendChild(tarjeta(p)); });
     }
+  }
+
+  /* ==========================================================================
+     Filtros por categoria
+     ========================================================================== */
+  function construirFiltros() {
+    if (!filtrosEl || productos.length === 0) return;
+
+    var conteoCategorias = {};
+    var sinCategoria = 0;
+    productos.forEach(function (p) {
+      var c = (p.categoria || "").trim();
+      if (c) conteoCategorias[c] = (conteoCategorias[c] || 0) + 1;
+      else sinCategoria++;
+    });
+    var nombresCategorias = Object.keys(conteoCategorias).sort(function (a, b) {
+      return a.localeCompare(b, "es");
+    });
+
+    var hayVarias = nombresCategorias.length >= 2;
+    var hayMixto = nombresCategorias.length >= 1 && sinCategoria > 0;
+    if (!hayVarias && !hayMixto) return;
+
+    var cards = grid ? Array.prototype.slice.call(grid.querySelectorAll(".card")) : [];
+
+    function aplicarFiltro(valor, chipActivo) {
+      var chips = filtrosEl.querySelectorAll(".chip");
+      for (var i = 0; i < chips.length; i++) chips[i].classList.remove("activo");
+      chipActivo.classList.add("activo");
+
+      var visibles = 0;
+      cards.forEach(function (card) {
+        var c = card.dataset.categoria || "";
+        var mostrar;
+        if (valor === "__todas__") mostrar = true;
+        else if (valor === "__otros__") mostrar = !c;
+        else mostrar = c === valor;
+        card.style.display = mostrar ? "" : "none";
+        if (mostrar) visibles++;
+      });
+      actualizarConteo(visibles);
+    }
+
+    function chip(etiqueta, valor) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip";
+      b.textContent = etiqueta;
+      b.addEventListener("click", function () { aplicarFiltro(valor, b); });
+      return b;
+    }
+
+    var total = productos.length;
+    var chipTodas = chip("Todas (" + total + ")", "__todas__");
+    filtrosEl.appendChild(chipTodas);
+    nombresCategorias.forEach(function (nombreCat) {
+      filtrosEl.appendChild(chip(nombreCat + " (" + conteoCategorias[nombreCat] + ")", nombreCat));
+    });
+    if (sinCategoria > 0) {
+      filtrosEl.appendChild(chip("Otros (" + sinCategoria + ")", "__otros__"));
+    }
+
+    chipTodas.classList.add("activo");
+    filtrosEl.removeAttribute("hidden");
+  }
+  construirFiltros();
+
+  /* ==========================================================================
+     Modal de detalle
+     ========================================================================== */
+  var overlayActual = null;
+  var escListener = null;
+  var origenFoco = null;
+
+  function crearGaleria(p, imagenesGrande) {
+    var wrap = document.createElement("div");
+    wrap.className = "det-galeria";
+
+    var grande = document.createElement("div");
+    grande.className = "det-img";
+
+    function pintarGrande(src) {
+      grande.innerHTML = "";
+      if (src) {
+        var img = document.createElement("img");
+        img.src = src; img.alt = p.nombre || "Producto";
+        img.onerror = function () { grande.innerHTML = ""; grande.appendChild(placeholder(p.nombre || "?")); };
+        grande.appendChild(img);
+      } else {
+        grande.appendChild(placeholder(p.nombre || "?"));
+      }
+    }
+
+    var lista = imagenesGrande.length ? imagenesGrande : [null];
+    pintarGrande(lista[0]);
+    wrap.appendChild(grande);
+
+    if (lista.length > 1) {
+      var thumbs = document.createElement("div");
+      thumbs.className = "det-thumbs";
+      lista.forEach(function (src, idx) {
+        var t = document.createElement("button");
+        t.type = "button";
+        t.className = "det-thumb" + (idx === 0 ? " activo" : "");
+        var timg = document.createElement("img");
+        timg.src = src; timg.alt = "";
+        t.appendChild(timg);
+        t.addEventListener("click", function () {
+          pintarGrande(src);
+          var todos = thumbs.querySelectorAll(".det-thumb");
+          for (var i = 0; i < todos.length; i++) todos[i].classList.remove("activo");
+          t.classList.add("activo");
+        });
+        thumbs.appendChild(t);
+      });
+      wrap.appendChild(thumbs);
+    }
+
+    return wrap;
+  }
+
+  function crearVideo(p) {
+    var idYT = idYouTube(p.video);
+    if (idYT) {
+      var caja = document.createElement("div");
+      caja.className = "det-video";
+      var iframe = document.createElement("iframe");
+      iframe.src = "https://www.youtube-nocookie.com/embed/" + idYT;
+      iframe.title = (p.nombre || "Video") + " — video";
+      iframe.loading = "lazy";
+      iframe.setAttribute("allowfullscreen", "");
+      iframe.setAttribute("frameborder", "0");
+      iframe.setAttribute("allow", "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture");
+      caja.appendChild(iframe);
+      return caja;
+    }
+    var a = document.createElement("a");
+    a.className = "det-video-link";
+    a.href = p.video;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.textContent = "Ver video ↗";
+    return a;
+  }
+
+  function cerrarDetalle() {
+    if (!overlayActual) return;
+    var ov = overlayActual;
+    ov.classList.remove("vista");
+    document.body.style.overflow = "";
+    if (escListener) { document.removeEventListener("keydown", escListener); escListener = null; }
+    setTimeout(function () { if (ov.parentNode) ov.parentNode.removeChild(ov); }, 200);
+    overlayActual = null;
+    if (origenFoco && origenFoco.focus) { origenFoco.focus(); }
+    origenFoco = null;
+  }
+
+  function abrirDetalle(p, origen) {
+    cerrarDetalle();
+    origenFoco = origen || null;
+
+    var ov = document.createElement("div");
+    ov.className = "detalle-ov";
+    ov.addEventListener("click", function (ev) {
+      if (ev.target === ov) cerrarDetalle();
+    });
+
+    var panel = document.createElement("div");
+    panel.className = "detalle";
+    panel.setAttribute("role", "dialog");
+    panel.setAttribute("aria-modal", "true");
+    if (p.nombre) panel.setAttribute("aria-label", p.nombre);
+
+    var cerrar = document.createElement("button");
+    cerrar.type = "button";
+    cerrar.className = "detalle-cerrar";
+    cerrar.textContent = "×";
+    cerrar.setAttribute("aria-label", "Cerrar");
+    cerrar.addEventListener("click", cerrarDetalle);
+    panel.appendChild(cerrar);
+
+    var izq = document.createElement("div");
+    izq.className = "detalle-izq";
+    var imagenesGrande = (p.imagenes && p.imagenes.length) ? p.imagenes.slice() : (p.imagen ? [p.imagen] : []);
+    izq.appendChild(crearGaleria(p, imagenesGrande));
+    panel.appendChild(izq);
+
+    var der = document.createElement("div");
+    der.className = "detalle-der";
+
+    if (p.categoria) {
+      var catEl = document.createElement("p");
+      catEl.className = "detalle-cat";
+      catEl.textContent = p.categoria;
+      der.appendChild(catEl);
+    }
+
+    var nombreEl = document.createElement("h2");
+    nombreEl.className = "detalle-nombre";
+    nombreEl.textContent = p.nombre || "";
+    der.appendChild(nombreEl);
+
+    if (p.descripcion) {
+      var descEl = document.createElement("p");
+      descEl.className = "detalle-desc";
+      descEl.textContent = p.descripcion;
+      der.appendChild(descEl);
+    }
+
+    if (p.especificaciones && p.especificaciones.length) {
+      der.appendChild(construirFicha(p));
+    }
+
+    if (p.video) {
+      der.appendChild(crearVideo(p));
+    }
+
+    var precioFila = document.createElement("div");
+    precioFila.className = "detalle-precio-fila";
+    var precioEl = document.createElement("span");
+    var pf = formatearPrecio(p.precio);
+    precioEl.className = "detalle-precio" + (pf ? "" : " consultar");
+    precioEl.textContent = pf || "Consultar";
+    precioFila.appendChild(precioEl);
+    der.appendChild(precioFila);
+
+    var pedirEl = document.createElement("a");
+    pedirEl.className = "detalle-pedir";
+    pedirEl.href = igURL;
+    pedirEl.target = "_blank";
+    pedirEl.rel = "noopener noreferrer";
+    pedirEl.textContent = "Pedir por Instagram";
+    der.appendChild(pedirEl);
+
+    panel.appendChild(der);
+    ov.appendChild(panel);
+    document.body.appendChild(ov);
+    document.body.style.overflow = "hidden";
+    overlayActual = ov;
+
+    escListener = function (ev) { if (ev.key === "Escape") cerrarDetalle(); };
+    document.addEventListener("keydown", escListener);
+
+    requestAnimationFrame(function () { ov.classList.add("vista"); cerrar.focus(); });
   }
 
   /* reveal */
