@@ -38,7 +38,7 @@
 
   /* hero */
   var elEye = document.getElementById("hero-eyebrow");
-  if (elEye && negocio.ciudad) elEye.textContent = "Estudio de impresion 3D en " + negocio.ciudad;
+  if (elEye && negocio.ciudad) elEye.textContent = "Estudio de impresión 3D en " + negocio.ciudad;
   var elCiudad = document.getElementById("hero-ciudad");
   if (elCiudad && negocio.ciudad) { elCiudad.textContent = negocio.ciudad; elCiudad.removeAttribute("hidden"); }
   var elTel = document.getElementById("hero-telefono");
