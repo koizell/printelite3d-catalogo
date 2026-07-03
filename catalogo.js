@@ -415,6 +415,13 @@
       der.appendChild(catEl);
     }
 
+    if (p.sku) {
+      var refEl = document.createElement("p");
+      refEl.className = "detalle-ref";
+      refEl.textContent = "Ref. " + p.sku;
+      der.appendChild(refEl);
+    }
+
     var nombreEl = document.createElement("h2");
     nombreEl.className = "detalle-nombre";
     nombreEl.textContent = p.nombre || "";
