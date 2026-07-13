@@ -181,12 +181,39 @@
     if (p.especificaciones && p.especificaciones.length) {
       body.appendChild(construirFicha(p));
     }
+    /* variaciones: selector en la misma tarjeta (Esqueleto, Creeper, pack completo...) */
+    var vars = Array.isArray(p.variantes) ? p.variantes : [];
+    var varSel = null;
+    if (vars.length) {
+      varSel = document.createElement("select");
+      varSel.className = "card-variantes";
+      varSel.setAttribute("aria-label", "Elegir variación de " + (p.nombre || "producto"));
+      vars.forEach(function (v, i) {
+        var o = document.createElement("option");
+        var pv = formatearPrecio(v.precio);
+        o.value = String(i);
+        o.textContent = (v.nombre || "") + " — " + (pv || "Consultar");
+        varSel.appendChild(o);
+      });
+      varSel.addEventListener("click", function (ev) { ev.stopPropagation(); });
+      body.appendChild(varSel);
+    }
+
     var fila = document.createElement("div"); fila.className = "card-precio";
-    var pf = formatearPrecio(p.precio);
+    var pf = formatearPrecio(vars.length ? vars[0].precio : p.precio);
     var val = document.createElement("span");
     val.className = "card-precio-val" + (pf ? "" : " consultar");
     val.textContent = pf || "Consultar";
     fila.appendChild(val);
+    if (varSel) {
+      varSel.addEventListener("change", function (ev) {
+        ev.stopPropagation();
+        var v = vars[Number(varSel.value)] || {};
+        var pv2 = formatearPrecio(v.precio);
+        val.textContent = pv2 || "Consultar";
+        val.className = "card-precio-val" + (pv2 ? "" : " consultar");
+      });
+    }
     var a = document.createElement("a");
     a.className = "card-pedir"; a.href = igURL; a.target = "_blank"; a.rel = "noopener noreferrer";
     a.textContent = "Pedir →";
@@ -442,14 +469,60 @@
       der.appendChild(crearVideo(p));
     }
 
+    /* variaciones en el detalle: chips seleccionables con contenido y precio propios */
+    var dvars = Array.isArray(p.variantes) ? p.variantes : [];
+    var precioEl = document.createElement("span");
+    var contenidoVar = null;
+    if (dvars.length) {
+      var vwrap = document.createElement("div");
+      vwrap.className = "det-variantes";
+      var vtit = document.createElement("p");
+      vtit.className = "det-var-tit";
+      vtit.textContent = "Elige tu versión:";
+      vwrap.appendChild(vtit);
+      var chipsWrap = document.createElement("div");
+      chipsWrap.className = "det-var-chips";
+      contenidoVar = document.createElement("p");
+      contenidoVar.className = "det-var-contenido";
+      var pintarVariante = function (idx) {
+        var v = dvars[idx] || {};
+        var pvv = formatearPrecio(v.precio);
+        precioEl.textContent = pvv || "Consultar";
+        precioEl.className = "detalle-precio" + (pvv ? "" : " consultar");
+        contenidoVar.textContent = v.contenido || "";
+        contenidoVar.style.display = v.contenido ? "" : "none";
+        var todos = chipsWrap.querySelectorAll(".det-var-chip");
+        for (var ci = 0; ci < todos.length; ci++) todos[ci].classList.toggle("activo", ci === idx);
+      };
+      dvars.forEach(function (v, i) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "det-var-chip";
+        var pv3 = formatearPrecio(v.precio);
+        b.textContent = (v.nombre || "") + (pv3 ? " · " + pv3 : "");
+        b.addEventListener("click", function () { pintarVariante(i); });
+        chipsWrap.appendChild(b);
+      });
+      vwrap.appendChild(chipsWrap);
+      vwrap.appendChild(contenidoVar);
+      der.appendChild(vwrap);
+    }
+
     var precioFila = document.createElement("div");
     precioFila.className = "detalle-precio-fila";
-    var precioEl = document.createElement("span");
-    var pf = formatearPrecio(p.precio);
+    var pf = formatearPrecio(dvars.length ? dvars[0].precio : p.precio);
     precioEl.className = "detalle-precio" + (pf ? "" : " consultar");
     precioEl.textContent = pf || "Consultar";
     precioFila.appendChild(precioEl);
     der.appendChild(precioFila);
+    if (dvars.length) {
+      /* estado inicial: primera variación activa (chip marcado + contenido visible) */
+      var chips0 = der.querySelectorAll(".det-var-chip");
+      if (chips0.length) chips0[0].classList.add("activo");
+      var v0 = dvars[0] || {};
+      contenidoVar.textContent = v0.contenido || "";
+      contenidoVar.style.display = v0.contenido ? "" : "none";
+    }
 
     var pedirEl = document.createElement("a");
     pedirEl.className = "detalle-pedir";

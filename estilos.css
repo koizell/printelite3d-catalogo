@@ -343,3 +343,25 @@ img { display: block; max-width: 100%; }
 .footer-ig-link:hover { border-color: var(--accent); }
 .footer-leyenda { font-size: 0.78rem; color: var(--ink-soft); max-width: 60ch; line-height: 1.5; }
 .footer-copy { font-size: 0.82rem; color: var(--ink-soft); }
+
+/* ==========================================================================
+   Variaciones del producto (Esqueleto, Creeper, pack completo...)
+   ========================================================================== */
+.card-variantes {
+  width: 100%; margin: 10px 0 2px; padding: 8px 10px;
+  font: 500 14px/1.3 var(--sans); color: var(--ink);
+  background: var(--paper-2); border: 1px solid var(--line-2); border-radius: 10px;
+  cursor: pointer;
+}
+.card-variantes:focus { outline: 2px solid var(--accent-2); outline-offset: 1px; }
+.det-variantes { margin: 14px 0 4px; }
+.det-var-tit { margin: 0 0 8px; font: 600 13px/1.3 var(--sans); color: var(--ink-2); }
+.det-var-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.det-var-chip {
+  font: 500 13px/1.2 var(--sans); color: var(--ink-2);
+  background: var(--paper-2); border: 1px solid var(--line-2); border-radius: 999px;
+  padding: 7px 14px; cursor: pointer; transition: all .15s ease;
+}
+.det-var-chip:hover { border-color: var(--accent-2); color: var(--ink); }
+.det-var-chip.activo { color: var(--paper-2); background: var(--accent); border-color: var(--accent); }
+.det-var-contenido { margin: 10px 0 0; font: 400 13.5px/1.5 var(--sans); color: var(--ink-2); }
