@@ -130,7 +130,8 @@ img { display: block; max-width: 100%; }
 .card { display: flex; flex-direction: column; cursor: pointer; }
 .card:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
 .card-media {
-  position: relative; aspect-ratio: 4 / 5; overflow: hidden;
+  /* 1:1 (estandar de tienda): menos franja vacia con fotos horizontales, sin recortar nada */
+  position: relative; aspect-ratio: 1 / 1; overflow: hidden;
   background: var(--paper-2); border: 1px solid var(--line); border-radius: 6px;
   transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
