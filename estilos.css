@@ -135,7 +135,8 @@ img { display: block; max-width: 100%; }
   transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 .card:hover .card-media { box-shadow: 0 22px 40px -26px rgba(34,31,26,0.4); transform: translateY(-4px); }
-.card-foto { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(.2,.7,.3,1); }
+/* contain: la foto completa siempre visible (cover recortaba los lados de las fotos horizontales) */
+.card-foto { width: 100%; height: 100%; object-fit: contain; transition: transform 0.6s cubic-bezier(.2,.7,.3,1); }
 .card:hover .card-foto { transform: scale(1.04); }
 
 .card-badges {
@@ -250,7 +251,7 @@ img { display: block; max-width: 100%; }
   aspect-ratio: 1 / 1; border-radius: 10px; overflow: hidden;
   background: var(--paper-2); border: 1px solid var(--line);
 }
-.det-img img { width: 100%; height: 100%; object-fit: cover; }
+.det-img img { width: 100%; height: 100%; object-fit: contain; }
 .det-img .card-placeholder { font-size: clamp(2.6rem, 6vw, 3.6rem); }
 
 .det-thumbs { display: flex; flex-wrap: wrap; gap: 0.5rem; }

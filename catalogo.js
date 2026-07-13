@@ -141,15 +141,23 @@
     var media = document.createElement("div");
     media.className = "card-media";
     var portada = portadaDe(p);
-    if (portada) {
-      var img = document.createElement("img");
-      img.className = "card-foto";
-      img.src = portada; img.alt = p.nombre || "Producto"; img.loading = "lazy";
-      img.onerror = function () { if (img.parentNode) img.parentNode.replaceChild(placeholder(p.nombre || "?"), img); };
-      media.appendChild(img);
-    } else {
-      media.appendChild(placeholder(p.nombre || "?"));
+    /* pintarMedia: muestra una foto (o el placeholder) en la tarjeta; lo reusa el
+       selector de variaciones para cambiar la foto al elegir */
+    function pintarMedia(src) {
+      var badgesPrevios = media.querySelector(".card-badges");
+      media.innerHTML = "";
+      if (src) {
+        var img = document.createElement("img");
+        img.className = "card-foto";
+        img.src = src; img.alt = p.nombre || "Producto"; img.loading = "lazy";
+        img.onerror = function () { if (img.parentNode) img.parentNode.replaceChild(placeholder(p.nombre || "?"), img); };
+        media.appendChild(img);
+      } else {
+        media.appendChild(placeholder(p.nombre || "?"));
+      }
+      if (badgesPrevios) media.appendChild(badgesPrevios);
     }
+    pintarMedia(portada);
 
     var badges = document.createElement("div");
     badges.className = "card-badges";
@@ -197,6 +205,8 @@
       });
       varSel.addEventListener("click", function (ev) { ev.stopPropagation(); });
       body.appendChild(varSel);
+      /* la primera variación está seleccionada: si tiene foto propia, la tarjeta la muestra */
+      if (vars[0] && vars[0].foto) pintarMedia(vars[0].foto);
     }
 
     var fila = document.createElement("div"); fila.className = "card-precio";
@@ -212,6 +222,7 @@
         var pv2 = formatearPrecio(v.precio);
         val.textContent = pv2 || "Consultar";
         val.className = "card-precio-val" + (pv2 ? "" : " consultar");
+        pintarMedia(v.foto || portada);   /* elegir la variación muestra SU foto */
       });
     }
     var a = document.createElement("a");
@@ -341,6 +352,7 @@
     var lista = imagenesGrande.length ? imagenesGrande : [null];
     pintarGrande(lista[0]);
     wrap.appendChild(grande);
+    wrap.pintarGrande = pintarGrande;   /* las variaciones cambian la foto grande al elegirse */
 
     if (lista.length > 1) {
       var thumbs = document.createElement("div");
@@ -429,7 +441,8 @@
     var izq = document.createElement("div");
     izq.className = "detalle-izq";
     var imagenesGrande = (p.imagenes && p.imagenes.length) ? p.imagenes.slice() : (p.imagen ? [p.imagen] : []);
-    izq.appendChild(crearGaleria(p, imagenesGrande));
+    var galeria = crearGaleria(p, imagenesGrande);
+    izq.appendChild(galeria);
     panel.appendChild(izq);
 
     var der = document.createElement("div");
@@ -493,6 +506,8 @@
         contenidoVar.style.display = v.contenido ? "" : "none";
         var todos = chipsWrap.querySelectorAll(".det-var-chip");
         for (var ci = 0; ci < todos.length; ci++) todos[ci].classList.toggle("activo", ci === idx);
+        /* la foto grande cambia a la de la variación elegida (o vuelve a la portada) */
+        if (galeria.pintarGrande) galeria.pintarGrande(v.foto || imagenesGrande[0] || null);
       };
       dvars.forEach(function (v, i) {
         var b = document.createElement("button");
@@ -516,12 +531,13 @@
     precioFila.appendChild(precioEl);
     der.appendChild(precioFila);
     if (dvars.length) {
-      /* estado inicial: primera variación activa (chip marcado + contenido visible) */
+      /* estado inicial: primera variación activa (chip marcado + contenido + su foto) */
       var chips0 = der.querySelectorAll(".det-var-chip");
       if (chips0.length) chips0[0].classList.add("activo");
       var v0 = dvars[0] || {};
       contenidoVar.textContent = v0.contenido || "";
       contenidoVar.style.display = v0.contenido ? "" : "none";
+      if (v0.foto && galeria.pintarGrande) galeria.pintarGrande(v0.foto);
     }
 
     var pedirEl = document.createElement("a");
