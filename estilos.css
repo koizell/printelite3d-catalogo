@@ -348,6 +348,87 @@ img { display: block; max-width: 100%; }
 .footer-copy { font-size: 0.82rem; color: var(--ink-soft); }
 
 /* ==========================================================================
+   VENTAJAS (franja de confianza bajo el hero)
+   ========================================================================== */
+.ventajas {
+  max-width: var(--wrap); margin: 0 auto;
+  padding: 0 clamp(1.25rem, 5vw, 2.75rem) clamp(1.5rem, 4vw, 2.5rem);
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.9rem;
+}
+.ventaja {
+  display: flex; align-items: flex-start; gap: 0.85rem;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  padding: 1.05rem 1.1rem;
+}
+.ventaja-ic {
+  flex: none; width: 2.4rem; height: 2.4rem; display: inline-flex; align-items: center; justify-content: center;
+  font-size: 1.15rem; color: var(--accent-2); border-radius: 10px;
+  background: var(--accent-soft); border: 1px solid rgba(61,155,245,0.28);
+  box-shadow: 0 0 16px -6px var(--glow);
+}
+.ventaja h3 { font-family: var(--display); font-weight: 700; font-size: 0.98rem; color: var(--ink); margin-bottom: 0.15rem; }
+.ventaja p { font-size: 0.86rem; color: var(--ink-soft); line-height: 1.45; }
+
+/* ==========================================================================
+   PASOS (como pedir)
+   ========================================================================== */
+.pasos {
+  max-width: var(--wrap); margin: 0 auto;
+  padding: clamp(2rem, 6vw, 4rem) clamp(1.25rem, 5vw, 2.75rem) clamp(1rem, 3vw, 2rem);
+}
+.pasos-head { text-align: center; margin-bottom: 2rem; }
+.pasos-titulo { font-family: var(--display); font-weight: 700; font-size: clamp(1.6rem, 5vw, 2.4rem); letter-spacing: -0.015em; color: var(--ink); }
+.pasos-sub { margin-top: 0.5rem; color: var(--ink-2); font-size: clamp(0.98rem, 2.2vw, 1.1rem); }
+.pasos-lista {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.1rem;
+}
+.paso-card {
+  position: relative;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+  padding: 1.6rem 1.4rem 1.4rem;
+}
+.paso-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 2.6rem; height: 2.6rem; margin-bottom: 0.85rem;
+  font-family: var(--display); font-weight: 800; font-size: 1.15rem; color: var(--accent-2);
+  border: 1.5px solid var(--accent); border-radius: 50%;
+  box-shadow: 0 0 18px -4px var(--glow), inset 0 0 12px -6px var(--glow);
+  background: radial-gradient(circle at 50% 40%, #16202f, #0c111a);
+}
+.paso-card h3 { font-family: var(--display); font-weight: 700; font-size: 1.12rem; color: var(--ink); margin-bottom: 0.35rem; }
+.paso-card p { font-size: 0.92rem; color: var(--ink-soft); line-height: 1.55; }
+
+/* ==========================================================================
+   CTA (cierre: escribenos)
+   ========================================================================== */
+.cta {
+  max-width: var(--wrap); margin: 0 auto;
+  padding: clamp(1.5rem, 4vw, 2.5rem) clamp(1.25rem, 5vw, 2.75rem) clamp(3rem, 8vw, 5rem);
+}
+.cta-inner {
+  position: relative; overflow: hidden;
+  border: 1px solid rgba(61,155,245,0.28); border-radius: 22px;
+  padding: clamp(2.2rem, 6vw, 3.6rem) clamp(1.5rem, 5vw, 3rem);
+  text-align: center;
+  background:
+    radial-gradient(70% 120% at 50% -20%, var(--glow-soft), transparent 60%),
+    linear-gradient(180deg, #10192a, #0c1119);
+}
+.cta-titulo { font-family: var(--display); font-weight: 800; font-size: clamp(1.8rem, 6vw, 3rem); letter-spacing: -0.02em; color: var(--ink); }
+.cta-sub { margin: 0.6rem auto 1.6rem; max-width: 44ch; color: var(--ink-2); font-size: clamp(1rem, 2.2vw, 1.15rem); }
+.cta-btn {
+  display: inline-flex; align-items: center; gap: 0.55rem;
+  font-size: 1rem; font-weight: 700; color: #06121f;
+  background: var(--accent); border-radius: 999px;
+  padding: 0.95rem 1.7rem;
+  box-shadow: 0 0 28px -6px var(--glow);
+  transition: background 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
+}
+.cta-btn:hover { background: var(--accent-2); transform: translateY(-2px); box-shadow: 0 0 36px -4px var(--glow); }
+.cta-btn .ig-icon { width: 20px; height: 20px; }
+
+/* ==========================================================================
    Variaciones del producto (Esqueleto, Creeper, pack completo...)
    ========================================================================== */
 .card-variantes {

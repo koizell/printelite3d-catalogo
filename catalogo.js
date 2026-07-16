@@ -80,6 +80,7 @@
 
   /* header/footer IG */
   var elTIG = document.getElementById("top-ig"); if (elTIG) elTIG.href = igURL;
+  var elCTA = document.getElementById("cta-ig"); if (elCTA) elCTA.href = igURL;
   var elFIG = document.getElementById("footer-ig"); if (elFIG) elFIG.href = igURL;
   var elFIGL = document.getElementById("footer-ig-label"); if (elFIGL) elFIGL.textContent = "@" + igHandle;
   var elFLey = document.getElementById("footer-leyenda");
