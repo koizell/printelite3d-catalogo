@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PrintElite3D &mdash; Catalogo</title>
-  <meta name="description" content="Impresion 3D, stickers y piezas personalizadas hechas a mano.">
+  <meta name="description" content="Impresion 3D hecha a mano en Monteria: llaveros, figuras y piezas personalizadas en PLA.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -12,95 +12,88 @@
 </head>
 <body>
 
-  <header class="top">
-    <a class="logo" id="logo" href="#top">
-      <span class="logo-mark" aria-hidden="true">P</span>
-      <span class="logo-text" id="nombre-negocio">PrintElite3D</span>
-    </a>
-    <a id="top-ig" class="top-ig" href="https://www.instagram.com/printelite3d" target="_blank" rel="noopener noreferrer">
-      <svg class="ig-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <rect x="3" y="3" width="18" height="18" rx="5" ry="5" stroke="currentColor" stroke-width="1.6"/>
-        <circle cx="12" cy="12" r="3.6" stroke="currentColor" stroke-width="1.6"/>
-        <circle cx="17.2" cy="6.8" r="1.1" fill="currentColor"/>
-      </svg>
-      <span class="top-ig-label">Instagram</span>
-    </a>
+  <header class="topbar">
+    <div class="topbar-in">
+      <a class="brand" href="#top">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2.6l8 4.6v9.6l-8 4.6-8-4.6V7.2l8-4.6z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+            <path d="M4 7.2l8 4.6 8-4.6M12 11.8V21.4" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span class="brand-name" id="nombre-negocio">PrintElite3D</span>
+      </a>
+      <a id="top-ig" class="ig-btn" href="https://www.instagram.com/printelite3d" target="_blank" rel="noopener noreferrer">
+        <svg class="ig-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.6"/>
+          <circle cx="12" cy="12" r="3.6" stroke="currentColor" stroke-width="1.6"/>
+          <circle cx="17.2" cy="6.8" r="1.15" fill="currentColor"/>
+        </svg>
+        <span class="ig-label" id="top-ig-label">@printelite3d</span>
+      </a>
+    </div>
   </header>
 
-  <section class="hero" id="top">
-    <p class="hero-eyebrow" id="hero-eyebrow">Estudio de impresi&oacute;n 3D</p>
-    <h1 class="hero-titulo">Piezas hechas<br>para sorprender.</h1>
-    <p class="hero-tagline">Impresi&oacute;n 3D, stickers y creaciones personalizadas &mdash; hechas a mano con cuidado. Escr&iacute;benos y lo hacemos realidad.</p>
-    <div class="hero-meta">
-      <span id="hero-ciudad" class="hero-dato" hidden></span>
-      <span id="hero-telefono" class="hero-dato" hidden></span>
-    </div>
-  </section>
+  <main id="top">
+    <section class="hero wrap">
+      <p class="eyebrow" id="hero-eyebrow">Estudio de impresi&oacute;n 3D</p>
+      <h1 class="hero-titulo">Piezas que <span class="hl">imprimimos</span><br>una por una.</h1>
+      <p class="hero-lede">Llaveros, figuras y encargos personalizados &mdash; modelados, impresos en PLA y armados a mano. Elige del cat&aacute;logo o p&iacute;denos el tuyo.</p>
+      <div class="facts" id="hero-facts">
+        <span class="fact" id="fact-ciudad" hidden><span class="dot"></span><span id="fact-ciudad-txt"></span></span>
+        <span class="fact"><span class="dot"></span>Impresi&oacute;n 3D en PLA</span>
+        <span class="fact"><span class="dot"></span>Pedidos por Instagram</span>
+      </div>
+    </section>
 
-  <section class="ventajas" aria-label="Por qu&eacute; PrintElite3D">
-    <div class="ventaja">
-      <span class="ventaja-ic" aria-hidden="true">&#x25C9;</span>
-      <div><h3>Impresi&oacute;n de precisi&oacute;n</h3><p>Capa a capa en PLA premium, con acabado parejo.</p></div>
-    </div>
-    <div class="ventaja">
-      <span class="ventaja-ic" aria-hidden="true">&#x2726;</span>
-      <div><h3>Hecho a mano</h3><p>Cada pieza se revisa y se arma una por una.</p></div>
-    </div>
-    <div class="ventaja">
-      <span class="ventaja-ic" aria-hidden="true">&#x25D0;</span>
-      <div><h3>Personalizable</h3><p>Colores, modelos y variaciones a tu gusto.</p></div>
-    </div>
-    <div class="ventaja">
-      <span class="ventaja-ic" aria-hidden="true">&#x27A4;</span>
-      <div><h3>Pedido f&aacute;cil</h3><p>Escr&iacute;benos por Instagram y coordinamos la entrega.</p></div>
-    </div>
-  </section>
+    <section class="catalog wrap">
+      <div class="cat-head">
+        <h2>Cat&aacute;logo</h2>
+        <span class="count" id="catalogo-conteo"></span>
+      </div>
+      <div id="catalogo-grid"></div>
 
-  <main class="catalogo">
-    <div class="catalogo-head">
-      <h2 class="catalogo-titulo">Cat&aacute;logo</h2>
-      <span class="catalogo-linea" aria-hidden="true"></span>
-      <span id="catalogo-conteo" class="catalogo-conteo"></span>
-    </div>
-    <div id="catalogo-filtros" class="filtros" hidden></div>
-    <div id="catalogo-grid" class="grid"></div>
+      <div class="strip">
+        <div>
+          <h4>&iquest;Quieres algo personalizado?</h4>
+          <p>Modelamos e imprimimos piezas a pedido &mdash; colores, tama&ntilde;os y dise&ntilde;os propios. Escr&iacute;benos y lo hacemos realidad.</p>
+        </div>
+        <a id="cta-ig" class="cta" href="https://www.instagram.com/printelite3d" target="_blank" rel="noopener noreferrer">
+          <svg class="ig-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.7"/>
+            <circle cx="12" cy="12" r="3.6" stroke="currentColor" stroke-width="1.7"/>
+            <circle cx="17.2" cy="6.8" r="1.15" fill="currentColor"/>
+          </svg>
+          Escr&iacute;benos
+        </a>
+      </div>
+    </section>
   </main>
 
-  <section class="pasos" aria-label="C&oacute;mo pedir">
-    <div class="pasos-head">
-      <h2 class="pasos-titulo">&iquest;C&oacute;mo pedir?</h2>
-      <p class="pasos-sub">Tres pasos y tu pieza est&aacute; en camino.</p>
-    </div>
-    <ol class="pasos-lista">
-      <li class="paso-card"><span class="paso-num">1</span><h3>Elige tu pieza</h3><p>Mira el cat&aacute;logo y las variaciones. Cada tarjeta te muestra material, medidas y precio.</p></li>
-      <li class="paso-card"><span class="paso-num">2</span><h3>Escr&iacute;benos</h3><p>Mand&aacute;nos un mensaje por Instagram con lo que quieres &mdash; color, cantidad y personalizaci&oacute;n.</p></li>
-      <li class="paso-card"><span class="paso-num">3</span><h3>La hacemos y la recibes</h3><p>La imprimimos, la revisamos y te avisamos apenas est&eacute; lista para entregar.</p></li>
-    </ol>
-  </section>
-
-  <section class="cta" aria-label="Escr&iacute;benos">
-    <div class="cta-inner">
-      <h2 class="cta-titulo">&iquest;Listo para tu pieza?</h2>
-      <p class="cta-sub">Escr&iacute;benos por Instagram y lo hacemos realidad.</p>
-      <a id="cta-ig" class="cta-btn" href="https://www.instagram.com/printelite3d" target="_blank" rel="noopener noreferrer">
-        <svg class="ig-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <rect x="3" y="3" width="18" height="18" rx="5" ry="5" stroke="currentColor" stroke-width="1.6"/>
-          <circle cx="12" cy="12" r="3.6" stroke="currentColor" stroke-width="1.6"/>
-          <circle cx="17.2" cy="6.8" r="1.1" fill="currentColor"/>
-        </svg>
-        Escribir por Instagram
-      </a>
-    </div>
-  </section>
-
   <footer class="footer">
-    <div class="footer-inner">
-      <div class="footer-marca"><span class="logo-mark" aria-hidden="true">P</span> <span id="footer-nombre">PrintElite3D</span></div>
-      <a id="footer-ig" class="footer-ig-link" href="https://www.instagram.com/printelite3d" target="_blank" rel="noopener noreferrer">
-        <span id="footer-ig-label">@printelite3d</span>
+    <div class="footer-in">
+      <a class="brand" href="#top">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2.6l8 4.6v9.6l-8 4.6-8-4.6V7.2l8-4.6z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+            <path d="M4 7.2l8 4.6 8-4.6M12 11.8V21.4" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span class="brand-name" id="footer-nombre">PrintElite3D</span>
       </a>
-      <p id="footer-leyenda" class="footer-leyenda" hidden></p>
-      <p class="footer-copy">&copy; <span id="footer-year"></span> PrintElite3D</p>
+      <span class="f-meta" id="footer-meta"></span>
+      <div class="f-right">
+        <a id="footer-ig" class="ig-btn" href="https://www.instagram.com/printelite3d" target="_blank" rel="noopener noreferrer">
+          <svg class="ig-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.6"/>
+            <circle cx="12" cy="12" r="3.6" stroke="currentColor" stroke-width="1.6"/>
+            <circle cx="17.2" cy="6.8" r="1.15" fill="currentColor"/>
+          </svg>
+          <span class="ig-label" id="footer-ig-label">@printelite3d</span>
+        </a>
+        <span class="f-meta">&copy; <span id="footer-year"></span> <span id="footer-year-nombre">PrintElite3D</span></span>
+      </div>
+      <p class="f-legal" id="footer-leyenda" hidden></p>
     </div>
   </footer>
 
