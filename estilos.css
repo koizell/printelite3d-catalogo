@@ -119,14 +119,16 @@ img { max-width: 100%; display: block; }
 /* bloque de producto (alterna lado) */
 .product {
   display: grid; grid-template-columns: minmax(0,1.02fr) minmax(0,1fr);
-  column-gap: 44px; row-gap: 24px; align-items: center;
+  grid-template-areas: "media info" "desc info";
+  grid-template-rows: auto 1fr;   /* la fila de la foto se ajusta a la foto; el texto queda pegado */
+  column-gap: 44px; row-gap: 16px; align-items: start;
   padding: 56px 0; border-bottom: 1px solid var(--line-soft);
 }
-/* orden explicito: foto, datos y (a lo ancho) la descripcion */
-.product .media { order: 1; }
-.product .info  { order: 2; }
-.product.rev .media { order: 2; }
-.product.rev .info  { order: 1; }
+/* la descripcion vive pegada DEBAJO de la foto (misma columna); los datos a un lado */
+.product .media  { grid-area: media; }
+.product .info   { grid-area: info; }
+.product .p-desc { grid-area: desc; }
+.product.rev { grid-template-areas: "info media" "info desc"; }
 
 .media {
   position: relative; border-radius: 16px; overflow: hidden;
@@ -160,12 +162,8 @@ img { max-width: 100%; display: block; }
   font-family: var(--font-display); font-weight: 700;
   font-size: clamp(1.8rem, 4vw, 2.5rem); line-height: 1.05; margin: 0 0 14px; letter-spacing: -.01em;
 }
-/* Descripcion: DEBAJO de la foto, a lo ancho de todo el bloque. Cambia al elegir
-   una variacion (muestra la descripcion de esa variacion). */
-.p-desc {
-  order: 3; grid-column: 1 / -1;
-  margin: 0; color: var(--ink-dim); font-size: 1.02rem; max-width: 74ch;
-}
+/* Descripcion: pegada debajo de la foto. Cambia al elegir una variacion. */
+.p-desc { margin: 0; color: var(--ink-dim); font-size: 1rem; line-height: 1.55; }
 
 /* variaciones: cada una con SU foto real */
 .variants { display: flex; flex-direction: column; gap: 8px; margin: 0 0 22px; }
@@ -248,10 +246,10 @@ img { max-width: 100%; display: block; }
 
 /* ---------- responsive ---------- */
 @media (max-width: 760px) {
-  .product { grid-template-columns: 1fr; column-gap: 0; row-gap: 22px; padding: 44px 0; }
-  .product .media, .product.rev .media { order: 1; }
-  .product .info,  .product.rev .info  { order: 2; }
-  .product .p-desc { order: 3; }
+  .product, .product.rev {
+    grid-template-columns: 1fr; grid-template-rows: auto; column-gap: 0; row-gap: 18px; padding: 44px 0;
+    grid-template-areas: "media" "desc" "info";   /* foto -> su texto -> datos */
+  }
   .hero { padding: 52px 0 30px; }
   .ig-label { display: none; }
   .strip { flex-direction: column; align-items: flex-start; }
