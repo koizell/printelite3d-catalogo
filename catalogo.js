@@ -122,7 +122,10 @@
       }
       var body = el("div", "var-body");
       body.appendChild(el("div", "var-name", v.nombre || ""));
-      if (v.contenido) body.appendChild(el("div", "var-sub", v.contenido));
+      // junto a la foto va la DESCRIPCION de la variacion (editable en la app);
+      // si esa variacion aun no tiene descripcion, se usa su Contenido.
+      var sub = v.descripcion || v.contenido || "";
+      if (sub) body.appendChild(el("div", "var-sub", sub));
       row.appendChild(body);
       row.appendChild(el("div", "var-price", precioTxt(v.precio) || "Consultar"));
 
@@ -213,7 +216,6 @@
 
     var hayVariantes = (p.variantes || []).length > 0;
     var desc = el("p", "p-desc", p.descripcion || "");
-    if (p.descripcion || hayVariantes) info.appendChild(desc);
 
     var compra = filaCompra(p);
     if (hayVariantes) {
@@ -229,6 +231,8 @@
     if ((p.especificaciones || []).length) info.appendChild(tablaSpecs(p));
     info.appendChild(compra.nodo);
     art.appendChild(info);
+    // la descripcion va DEBAJO, a lo ancho de todo el bloque (foto + datos)
+    if (p.descripcion || hayVariantes) art.appendChild(desc);
     return art;
   }
 
