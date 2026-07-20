@@ -179,6 +179,16 @@ img { max-width: 100%; display: block; }
 .var-name { font-weight: 600; font-size: .98rem; }
 .var-sub { font-size: .82rem; color: var(--ink-faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .var-price { font-family: var(--font-mono); font-size: .95rem; white-space: nowrap; }
+/* la variacion es seleccionable: al elegirla cambia la foto, el precio y la descripcion */
+.var { cursor: pointer; user-select: none; }
+.var:focus-visible { outline: 2px solid var(--blue-bright); outline-offset: 2px; }
+.var.sel {
+  border-color: var(--blue);
+  background: linear-gradient(180deg, rgba(61,155,245,.16), rgba(61,155,245,.05));
+  box-shadow: 0 0 0 1px var(--blue) inset, 0 8px 26px -14px var(--glow);
+}
+.var.sel .var-price { color: var(--blue-bright); font-weight: 600; }
+.var-hint { font-size: .82rem; color: var(--ink-faint); margin: 0 0 9px; }
 
 /* ficha tecnica */
 .specs { width: 100%; border-collapse: collapse; margin: 0 0 22px; font-family: var(--font-mono); font-size: 12.5px; }

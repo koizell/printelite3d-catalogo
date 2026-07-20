@@ -69,8 +69,7 @@
     var fc = document.getElementById("fact-ciudad");
     if (fc) { fc.hidden = false; texto("fact-ciudad-txt", "Hecho a mano en " + ciudad); }
   }
-  var metaPie = [ciudad, (neg.telefono || "").trim()].filter(Boolean).join(" · ");
-  texto("footer-meta", metaPie);
+  texto("footer-meta", [ciudad, (neg.telefono || "").trim()].filter(Boolean).join(" · "));
   var leyenda = (neg.leyenda || "").trim();
   if (leyenda) {
     var lg = document.getElementById("footer-leyenda");
@@ -90,7 +89,7 @@
       img.alt = p.nombre || "";
       img.loading = "lazy";
       media.appendChild(img);
-      return media;
+      return { nodo: media, img: img };
     }
     var ph = el("div", "media ph");
     ph.setAttribute("role", "img");
@@ -99,19 +98,24 @@
     box.appendChild(el("div", "ph-mono", p.nombre || ""));
     box.appendChild(el("div", "ph-note", "Foto proximamente"));
     ph.appendChild(box);
-    return ph;
+    return { nodo: ph, img: null };
   }
 
-  function listaVariantes(p) {
+  /* Variaciones SELECCIONABLES: al elegir una cambian la foto grande, el precio
+     y la descripcion del producto. Accesible con teclado (Enter / Espacio). */
+  function listaVariantes(p, refs) {
     var wrap = el("div", "variants");
+    var filas = [];
     (p.variantes || []).forEach(function (v) {
       var row = el("div", "var");
+      row.setAttribute("role", "button");
+      row.setAttribute("tabindex", "0");
+      row.setAttribute("aria-pressed", "false");
+
       var src = srcSeguro(v.foto);
       if (src) {
         var im = el("img", "var-th");
-        im.src = src;
-        im.alt = v.nombre || "";
-        im.loading = "lazy";
+        im.src = src; im.alt = v.nombre || ""; im.loading = "lazy";
         row.appendChild(im);
       } else {
         row.appendChild(el("span", "var-th var-th-none", "sin foto"));
@@ -121,6 +125,33 @@
       if (v.contenido) body.appendChild(el("div", "var-sub", v.contenido));
       row.appendChild(body);
       row.appendChild(el("div", "var-price", precioTxt(v.precio) || "Consultar"));
+
+      function elegir() {
+        filas.forEach(function (f) {
+          f.classList.remove("sel");
+          f.setAttribute("aria-pressed", "false");
+        });
+        row.classList.add("sel");
+        row.setAttribute("aria-pressed", "true");
+        if (refs.img && (src || refs.portada)) refs.img.src = src || refs.portada;
+        var pz = precioTxt(v.precio);
+        if (refs.pk) refs.pk.textContent = "Precio";
+        if (refs.pv) {
+          refs.pv.textContent = pz || "Consultanos";
+          refs.pv.className = pz ? "pl-v" : "pl-v soft";
+        }
+        if (refs.desc) {
+          refs.desc.textContent = v.descripcion || v.contenido || p.descripcion || "";
+        }
+      }
+      row.addEventListener("click", elegir);
+      row.addEventListener("keydown", function (ev) {
+        if (ev.key === "Enter" || ev.key === " " || ev.key === "Spacebar") {
+          ev.preventDefault();
+          elegir();
+        }
+      });
+      filas.push(row);
       wrap.appendChild(row);
     });
     return wrap;
@@ -147,13 +178,11 @@
     var base = Number(p.precio);
     var minimo = precios.length ? Math.min.apply(null, precios)
                : (isFinite(base) && base > 0 ? base : null);
-    if (minimo) {
-      lead.appendChild(el("span", "pl-k", precios.length > 1 ? "Desde" : "Precio"));
-      lead.appendChild(el("span", "pl-v", precioTxt(minimo)));
-    } else {
-      lead.appendChild(el("span", "pl-k", "Precio"));
-      lead.appendChild(el("span", "pl-v soft", "Consultanos"));
-    }
+
+    var k = el("span", "pl-k", minimo ? (precios.length > 1 ? "Desde" : "Precio") : "Precio");
+    var v = minimo ? el("span", "pl-v", precioTxt(minimo)) : el("span", "pl-v soft", "Consultanos");
+    lead.appendChild(k);
+    lead.appendChild(v);
     buy.appendChild(lead);
 
     var a = el("a", "cta");
@@ -170,19 +199,35 @@
       lv.href = vid; lv.target = "_blank"; lv.rel = "noopener noreferrer";
       buy.appendChild(lv);
     }
-    return buy;
+    return { nodo: buy, k: k, v: v };
   }
 
   function bloqueProducto(p, i) {
     var art = el("article", "product" + (i % 2 ? " rev" : ""));
-    art.appendChild(bloqueMedia(p));
+    var media = bloqueMedia(p);
+    art.appendChild(media.nodo);
+
     var info = el("div", "info");
     if (p.categoria) info.appendChild(el("p", "p-cat", p.categoria));
     info.appendChild(el("h3", null, p.nombre || ""));
-    if (p.descripcion) info.appendChild(el("p", "p-desc", p.descripcion));
-    if ((p.variantes || []).length) info.appendChild(listaVariantes(p));
+
+    var hayVariantes = (p.variantes || []).length > 0;
+    var desc = el("p", "p-desc", p.descripcion || "");
+    if (p.descripcion || hayVariantes) info.appendChild(desc);
+
+    var compra = filaCompra(p);
+    if (hayVariantes) {
+      info.appendChild(el("p", "var-hint", "Toca una variacion para ver su foto y su precio"));
+      info.appendChild(listaVariantes(p, {
+        img: media.img,
+        portada: srcSeguro(p.imagen),
+        desc: desc,
+        pk: compra.k,
+        pv: compra.v
+      }));
+    }
     if ((p.especificaciones || []).length) info.appendChild(tablaSpecs(p));
-    info.appendChild(filaCompra(p));
+    info.appendChild(compra.nodo);
     art.appendChild(info);
     return art;
   }
