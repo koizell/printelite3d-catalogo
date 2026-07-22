@@ -1,5 +1,6 @@
-/* PrintElite3D - catalogo publico (product-first).
-   Consume window.CATALOGO (generado por core/catalogo_web.py con whitelist de campos).
+/* PrintElite3D - catalogo publico.
+   Dos vistas: INICIO (bloques editoriales product-first) y CATALOGO (buscador +
+   filtros por categoria + cuadricula + detalle). Navegacion por hash (#catalogo).
    SEGURIDAD: todo dato del catalogo se pinta con textContent / propiedades del DOM,
    NUNCA con innerHTML, y las rutas de imagen se validan contra "img/<archivo>". */
 (function () {
@@ -30,7 +31,6 @@
     var limpio = h.replace(/^@/, "").replace(/[^A-Za-z0-9._]/g, "");
     return limpio || "printelite3d";
   }
-  /* solo aceptamos rutas relativas que este mismo exportador genera */
   function srcSeguro(u) {
     u = String(u == null ? "" : u);
     return /^img\/[A-Za-z0-9._-]+$/.test(u) ? u : null;
@@ -46,6 +46,16 @@
   function texto(id, valor) {
     var e = document.getElementById(id);
     if (e && valor) e.textContent = valor;
+  }
+  function precioDesde(p) {
+    var precios = (p.variantes || [])
+      .map(function (v) { return Number(v.precio); })
+      .filter(function (n) { return isFinite(n) && n > 0; });
+    var base = Number(p.precio);
+    return {
+      min: precios.length ? Math.min.apply(null, precios) : (isFinite(base) && base > 0 ? base : null),
+      varios: precios.length > 1
+    };
   }
 
   var igUser = normalizeIG(neg.instagram);
@@ -78,7 +88,7 @@
   var anio = document.getElementById("footer-year");
   if (anio) anio.textContent = String(new Date().getFullYear());
 
-  /* ---------- productos ---------- */
+  /* ================= BLOQUE DE PRODUCTO (compartido: inicio y detalle) ================= */
   function bloqueMedia(p) {
     var src = srcSeguro(p.imagen);
     if (src) {
@@ -101,8 +111,6 @@
     return { nodo: ph, img: null };
   }
 
-  /* Variaciones SELECCIONABLES: al elegir una cambian la foto grande, el precio
-     y la descripcion del producto. Accesible con teclado (Enter / Espacio). */
   function listaVariantes(p, refs) {
     var wrap = el("div", "variants");
     var filas = [];
@@ -122,8 +130,6 @@
       }
       var body = el("div", "var-body");
       body.appendChild(el("div", "var-name", v.nombre || ""));
-      // junto a la foto va la DESCRIPCION de la variacion (editable en la app);
-      // si esa variacion aun no tiene descripcion, se usa su Contenido.
       var sub = v.descripcion || v.contenido || "";
       if (sub) body.appendChild(el("div", "var-sub", sub));
       row.appendChild(body);
@@ -175,15 +181,9 @@
   function filaCompra(p) {
     var buy = el("div", "buy");
     var lead = el("div", "price-lead");
-    var precios = (p.variantes || [])
-      .map(function (v) { return Number(v.precio); })
-      .filter(function (n) { return isFinite(n) && n > 0; });
-    var base = Number(p.precio);
-    var minimo = precios.length ? Math.min.apply(null, precios)
-               : (isFinite(base) && base > 0 ? base : null);
-
-    var k = el("span", "pl-k", minimo ? (precios.length > 1 ? "Desde" : "Precio") : "Precio");
-    var v = minimo ? el("span", "pl-v", precioTxt(minimo)) : el("span", "pl-v soft", "Consultanos");
+    var pd = precioDesde(p);
+    var k = el("span", "pl-k", pd.min ? (pd.varios ? "Desde" : "Precio") : "Precio");
+    var v = pd.min ? el("span", "pl-v", precioTxt(pd.min)) : el("span", "pl-v soft", "Consultanos");
     lead.appendChild(k);
     lead.appendChild(v);
     buy.appendChild(lead);
@@ -193,7 +193,7 @@
     a.target = "_blank";
     a.rel = "noopener noreferrer";
     a.appendChild(iconoIG());
-    a.appendChild(document.createTextNode(minimo ? "Pedir por Instagram" : "Consultar por Instagram"));
+    a.appendChild(document.createTextNode(pd.min ? "Pedir por Instagram" : "Consultar por Instagram"));
     buy.appendChild(a);
 
     var vid = urlSegura(p.video);
@@ -231,11 +231,11 @@
     if ((p.especificaciones || []).length) info.appendChild(tablaSpecs(p));
     info.appendChild(compra.nodo);
     art.appendChild(info);
-    // la descripcion va DEBAJO, a lo ancho de todo el bloque (foto + datos)
     if (p.descripcion || hayVariantes) art.appendChild(desc);
     return art;
   }
 
+  /* ================= VISTA INICIO ================= */
   var grid = document.getElementById("catalogo-grid");
   if (grid) {
     if (!prods.length) {
@@ -248,4 +248,163 @@
   if (conteo && prods.length) {
     conteo.textContent = prods.length === 1 ? "1 producto" : prods.length + " productos";
   }
+
+  /* ================= VISTA CATALOGO (buscador + chips + tarjetas) ================= */
+  var filtroCat = "*";
+  var filtroTxt = "";
+
+  function categorias() {
+    var vistas = {};
+    var out = [];
+    prods.forEach(function (p) {
+      var c = (p.categoria || "").trim();
+      if (c && !vistas[c.toLowerCase()]) { vistas[c.toLowerCase()] = true; out.push(c); }
+    });
+    return out;
+  }
+
+  function coincide(p) {
+    if (filtroCat !== "*" && (p.categoria || "").trim() !== filtroCat) return false;
+    if (!filtroTxt) return true;
+    var q = filtroTxt.toLowerCase();
+    if ((p.nombre || "").toLowerCase().indexOf(q) >= 0) return true;
+    if ((p.categoria || "").toLowerCase().indexOf(q) >= 0) return true;
+    if ((p.descripcion || "").toLowerCase().indexOf(q) >= 0) return true;
+    return (p.variantes || []).some(function (v) {
+      return (v.nombre || "").toLowerCase().indexOf(q) >= 0;
+    });
+  }
+
+  function tarjeta(p) {
+    var card = el("article", "pcard");
+    card.setAttribute("role", "button");
+    card.setAttribute("tabindex", "0");
+
+    var ph = el("div", "pcard-ph");
+    var src = srcSeguro(p.imagen);
+    if (src) {
+      var img = el("img");
+      img.src = src; img.alt = p.nombre || ""; img.loading = "lazy";
+      ph.appendChild(img);
+    } else {
+      ph.classList.add("vacia");
+      ph.appendChild(el("span", "pcard-ph-txt", p.nombre || ""));
+    }
+    if (p.categoria) ph.appendChild(el("span", "pcard-cat", p.categoria));
+    card.appendChild(ph);
+
+    var b = el("div", "pcard-b");
+    b.appendChild(el("div", "pcard-nm", p.nombre || ""));
+    var pd = precioDesde(p);
+    var pz = el("div", "pcard-pz");
+    if (pd.min) {
+      if (pd.varios) pz.appendChild(el("small", null, "desde"));
+      pz.appendChild(document.createTextNode(precioTxt(pd.min)));
+    } else {
+      pz.appendChild(document.createTextNode("Consultar"));
+      pz.classList.add("soft");
+    }
+    b.appendChild(pz);
+    var nv = (p.variantes || []).length;
+    if (nv) b.appendChild(el("div", "pcard-nv", nv === 1 ? "1 variacion" : nv + " variaciones"));
+    card.appendChild(b);
+
+    function abrir() { abrirDetalle(p); }
+    card.addEventListener("click", abrir);
+    card.addEventListener("keydown", function (ev) {
+      if (ev.key === "Enter" || ev.key === " " || ev.key === "Spacebar") { ev.preventDefault(); abrir(); }
+    });
+    return card;
+  }
+
+  function pintarCards() {
+    var cont = document.getElementById("cat-cards");
+    var vacio = document.getElementById("cat-vacio");
+    if (!cont) return;
+    cont.textContent = "";
+    var n = 0;
+    prods.forEach(function (p) {
+      if (!coincide(p)) return;
+      n++;
+      cont.appendChild(tarjeta(p));
+    });
+    if (vacio) vacio.hidden = n > 0;
+    var c = document.getElementById("cat-conteo");
+    if (c) c.textContent = n === 1 ? "1 producto" : n + " productos";
+  }
+
+  function pintarChips() {
+    var cont = document.getElementById("cat-chips");
+    if (!cont) return;
+    cont.textContent = "";
+    var cats = categorias();
+    if (cats.length < 2) return;   // con una sola categoria los chips no aportan
+    var todos = el("button", "chip on", "Todos");
+    todos.type = "button";
+    cont.appendChild(todos);
+    var botones = [todos];
+    cats.forEach(function (c) {
+      var b = el("button", "chip", c);
+      b.type = "button";
+      botones.push(b);
+      cont.appendChild(b);
+    });
+    botones.forEach(function (b, i) {
+      b.addEventListener("click", function () {
+        botones.forEach(function (x) { x.classList.toggle("on", x === b); });
+        filtroCat = i === 0 ? "*" : b.textContent;
+        pintarCards();
+      });
+    });
+  }
+
+  var buscar = document.getElementById("cat-buscar");
+  if (buscar) {
+    buscar.addEventListener("input", function () {
+      filtroTxt = buscar.value.trim();
+      pintarCards();
+    });
+  }
+  pintarChips();
+  pintarCards();
+
+  /* ================= DETALLE (reusa el bloque editorial) ================= */
+  var detOv = document.getElementById("det-ov");
+  function abrirDetalle(p) {
+    if (!detOv) return;
+    texto("det-titulo", p.nombre || "Producto");
+    var body = document.getElementById("det-body");
+    body.textContent = "";
+    body.appendChild(bloqueProducto(p, 0));
+    detOv.hidden = false;
+    document.body.classList.add("sin-scroll");
+    var x = document.getElementById("det-x");
+    if (x) x.focus();
+  }
+  function cerrarDetalle() {
+    if (!detOv || detOv.hidden) return;
+    detOv.hidden = true;
+    document.body.classList.remove("sin-scroll");
+  }
+  var detX = document.getElementById("det-x");
+  if (detX) detX.addEventListener("click", cerrarDetalle);
+  if (detOv) detOv.addEventListener("mousedown", function (e) { if (e.target === detOv) cerrarDetalle(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") cerrarDetalle(); });
+
+  /* ================= NAVEGACION POR PESTANA (hash) ================= */
+  function ruta() {
+    var enCat = location.hash === "#catalogo";
+    var vi = document.getElementById("vista-inicio");
+    var vc = document.getElementById("vista-catalogo");
+    if (vi) vi.hidden = enCat;
+    if (vc) vc.hidden = !enCat;
+    var ni = document.getElementById("nav-inicio");
+    var nc = document.getElementById("nav-catalogo");
+    if (ni) ni.classList.toggle("activo", !enCat);
+    if (nc) nc.classList.toggle("activo", enCat);
+    cerrarDetalle();
+    window.scrollTo(0, 0);
+  }
+  window.addEventListener("hashchange", ruta);
+  ruta();
 })();
